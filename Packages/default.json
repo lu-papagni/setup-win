@@ -1,0 +1,28 @@
+{
+  "$schema" : "https://aka.ms/winget-packages.schema.2.0.json",
+  "CreationDate" : "2024-09-14T16:03:56.760-00:00",
+  "Sources" : 
+  [
+    {
+      "Packages" : 
+      [
+        { "PackageIdentifier" : "EclipseAdoptium.Temurin.21.JDK" },
+        { "PackageIdentifier" : "VideoLAN.VLC" },
+        { "PackageIdentifier" : "Microsoft.PowerShell" },
+        { "PackageIdentifier" : "WinFsp.WinFsp" },
+        { "PackageIdentifier" : "Brave.Brave" },
+        { "PackageIdentifier" : "Discord.Discord" },
+        { "PackageIdentifier" : "Spotify.Spotify" },
+        { "PackageIdentifier" : "Microsoft.WindowsTerminal" }
+      ],
+      "SourceDetails" : 
+      {
+        "Argument" : "https://cdn.winget.microsoft.com/cache",
+        "Identifier" : "Microsoft.Winget.Source_8wekyb3d8bbwe",
+        "Name" : "winget",
+        "Type" : "Microsoft.PreIndexed.Package"
+      }
+    }
+  ],
+  "WinGetVersion" : "1.8.1911"
+}
