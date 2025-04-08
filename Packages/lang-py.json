@@ -5,8 +5,8 @@
     {
       "Packages" : 
       [
-        { "PackageIdentifier" : "Valve.Steam" },
-        { "PackageIdentifier" : "EpicGames.EpicGamesLauncher" },
+        { "PackageIdentifier" : "Python.Launcher" },
+        { "PackageIdentifier" : "Python.Python.3.11" },
       ],
       "SourceDetails" : 
       {

@@ -6,10 +6,8 @@
       "Packages" : 
       [
         { "PackageIdentifier" : "Audacity.Audacity" },
-        { "PackageIdentifier" : "PowerSoftware.AnyBurn" },
         { "PackageIdentifier" : "HandBrake.HandBrake" },
         { "PackageIdentifier" : "MoritzBunkus.MKVToolNix" },
-        { "PackageIdentifier" : "OBSProject.OBSStudio" },
         { "PackageIdentifier" : "Gyan.FFmpeg" },
       ],
       "SourceDetails" : 

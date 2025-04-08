@@ -6,11 +6,8 @@
       "Packages" : 
       [
         { "PackageIdentifier" : "Git.Git" },
-        { "PackageIdentifier" : "OpenJS.NodeJS" },
-        { "PackageIdentifier" : "Python.Launcher" },
-        { "PackageIdentifier" : "Python.Python.3.11" },
+        { "PackageIdentifier" : "Debian.Debian" },
         { "PackageIdentifier" : "Microsoft.WindowsTerminal" },
-        { "PackageIdentifier" : "equalsraf.win32yank" }
       ],
       "SourceDetails" : 
       {

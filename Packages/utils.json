@@ -6,12 +6,12 @@
       "Packages" : 
       [
         { "PackageIdentifier" : "AntibodySoftware.WizTree" },
-        { "PackageIdentifier" : "NordSecurity.NordVPN" },
         { "PackageIdentifier" : "RevoUninstaller.RevoUninstaller" },
-        { "PackageIdentifier" : "qBittorrent.qBittorrent" },
         { "PackageIdentifier" : "Rclone.Rclone" },
         { "PackageIdentifier" : "Cyanfish.NAPS2" },
         { "PackageIdentifier" : "Microsoft.PowerToys" },
+        { "PackageIdentifier" : "PowerSoftware.AnyBurn" },
+        { "PackageIdentifier" : "Rufus.Rufus" },
       ],
       "SourceDetails" : 
       {

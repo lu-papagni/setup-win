@@ -5,8 +5,7 @@
     {
       "Packages" : 
       [
-        { "PackageIdentifier" : "Valve.Steam" },
-        { "PackageIdentifier" : "EpicGames.EpicGamesLauncher" },
+        { "PackageIdentifier" : "OpenJS.NodeJS" },
       ],
       "SourceDetails" : 
       {
