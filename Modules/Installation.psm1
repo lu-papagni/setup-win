@@ -73,6 +73,8 @@ function Install-Packages {
       $packageList = Join-Path -Path $PackageListPath -ChildPath "$list.json" | Resolve-Path
 
       if ($packageList -ne $null) {
+        Write-Verbose "Trovata lista: `"$packageList`""
+
         try {
           $importArgs = Parse-PackageManagerArgs `
                         -CommandList $PackageManager.actions.import `
@@ -83,7 +85,7 @@ function Install-Packages {
                       "CAUSA: errori di sintassi nel comando del package manager."
         }
 
-        if ($PSCmdlet.ShouldProcess($packageList, "Installazione pacchetti")) {
+        if ($PSCmdlet.ShouldProcess($importCmd, "Installazione pacchetti")) {
           Invoke-Expression $importCmd
         }
       } else {
