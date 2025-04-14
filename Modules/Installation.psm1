@@ -60,8 +60,8 @@ function Install-Packages {
       $updateArgs = Parse-PackageManagerArgs -CommandList $PackageManager.actions.update
       $updateCmd = $manager, $updateArgs -join ' '
     } catch {
-      Write-Error "Non è stato possibile aggiornare il sistema.", `
-                  "CAUSA: errori di sintassi nel comando del package manager."
+      Write-Error ("Non è stato possibile aggiornare il sistema." + `
+                  "CAUSA: errori di sintassi nel comando del package manager.")
     }
 
     if ($PSCmdlet.ShouldProcess($updateCmd, "Aggiornamento pacchetti")) {
@@ -81,8 +81,8 @@ function Install-Packages {
                         -Substitute @( "$packageList" )
           $importCmd = $manager, $importArgs -join ' '
         } catch {
-          Write-Error "Non è stato possibile importare i pacchetti desiderati.", `
-                      "CAUSA: errori di sintassi nel comando del package manager."
+          Write-Error ("Non è stato possibile importare i pacchetti desiderati." + `
+                      "CAUSA: errori di sintassi nel comando del package manager.")
         }
 
         if ($PSCmdlet.ShouldProcess($importCmd, "Installazione pacchetti")) {
@@ -93,7 +93,7 @@ function Install-Packages {
       }
     }
   } else {
-    Write-Error "Impossibile trovare il comando: ", $cmdInfo.Name
+    Write-Error ("Impossibile trovare il comando: " + $cmdInfo.Name)
   }
 }
 
