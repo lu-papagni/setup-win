@@ -10,8 +10,8 @@ Lo script è compatibile con tutti i PC Windows con una versione di **PowerShell
 
 ## Sintassi
 Lo script usa una sintassi simile a quella dei _cmdlet_ di PowerShell:
-```
-Setup.ps1 [-DryRun] [-Config <percorso-file-configurazione JSON>]
+```ps1
+.\Setup.ps1 [-DryRun] [-Config 'percorso\della\configurazione.json']
 ```
 
 Parametri:
@@ -26,25 +26,26 @@ Non possono esserci:
 - Commenti
 - Virgole che non precedono un elemento (_trailing comma_)
 
-**NON FARE QUESTO**
-```json
-{
-    "lista": [1, 2, 3,],    // virgola non ammessa nelle liste (vedi dopo il "3")
-    "numero": 69,           // stessa cosa alla fine della lista di attributi
-    // in generale non mettere MAI i commenti
-}
-```
+[!WARNING]
+> Un esempio di cosa NON fare.
+> ```json
+> {
+>     "lista": [1, 2, 3,],    // virgola non ammessa nelle liste (vedi dopo il "3")
+>     "numero": 69,           // stessa cosa alla fine della lista di attributi
+>     // in generale non mettere MAI i commenti
+> }
+> ```
 
-Da PowerShell `7` è permessa questa sintassi. Per tutte le versioni precedenti fare in questo modo risulterebbe
+Da PowerShell `7.x` è permessa questa sintassi. Per tutte le versioni precedenti fare in questo modo risulterebbe
 in un crash.
 
 ## Funzionalità
 Per un esempio completo vedere
-[setup-config.json](https://github.com/lu-papagni/dots-win/blob/082f35fde3ce96662da24da6c728f0c5e84f452c/setup-config.json)
+[setup-config.json](https://github.com/lu-papagni/dots-win/blob/67216153255d0409bf8ac303a45fa047856b62c7/setup-config.json)
 
 ### Installazione programmi
 La configurazione deve contenere un oggetto con chiave `installPrograms`.
-I programmi verranno installati usando il package manager di Windows, `winget`.
+I programmi verranno installati usando il package manager definito dall'utente.
 
 **Proprietà**
 <table>
@@ -66,7 +67,48 @@ I programmi verranno installati usando il package manager di Windows, `winget`.
             senza estensione, che corrispondono a backup di <code>winget</code>.
         </td>
     </tr>
+    <tr>
+        <td>packageManager</td>
+        <td>Oggetto</td>
+        <td>Contiene le info sul package manager e le azioni che può compiere.</td>
+    </tr>
 </table>
+
+**Struttura di `packageManager`**
+<table>
+    <tr>
+        <th>Chiave</th>
+        <th>Tipo</th>
+        <th>Descrizione</th>
+    </tr>
+    <tr>
+        <td>name</td>
+        <td>Stringa</td>
+        <td>
+            Nome del package manager. Verrà usato per controllare la sua presenza nel sistema,
+            dopodiché come primo elemento di ogni comando.
+        </td>
+    </tr>
+    <tr>
+        <td>actions</td>
+        <td>Oggetto</td>
+        <td>
+            Una serie di coppie chiave - valore, dove la chiave è una stringa (il nome dell'azione) e
+            il valore è una lista di stringhe, dove ognuna è un parametro per quella determinata azione.
+            Le azioni supportate sono <code>update</code> e <code>import</code>: la prima specifica come
+            il package manager aggiorna l'intero sistema; il secondo come importa una serie di pacchetti
+            da installare.
+        </td>
+    </tr>
+</table>
+
+[!NOTE]
+> I comandi del package manager possono essere resi modulari. In particolare, l'azione
+> `import` permette già di specificare un parametro posizionale `${0}`.
+> Al momento, questo sistema viene usato internamente per segnalare dove inserire il percorso
+> del file da cui importare i pacchetti.
+> In generale questa soluzione può essere esposta per passare una serie di parametri, dove
+> il numero nel segnaposto rappresenta l'indice di una stringa nella lista in input.
 
 ### Importazione file di configurazione
 Controllato dall'oggetto con chiave `configFiles`.
