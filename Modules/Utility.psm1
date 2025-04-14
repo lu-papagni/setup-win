@@ -1,4 +1,6 @@
-function Convert-JsonObject {
+# Helper per Powershell 5.x dove la funzione `ConvertFrom-Json`
+# non aveva ancora implementato questa conversione
+function ConvertTo-HashMap {
   param($Source = $null)
 
   if ($Source -eq $null) {
@@ -30,5 +32,5 @@ function Test-Compatibility {
   }
 }
 
-Export-ModuleMember -Function Convert-JsonObject
+Export-ModuleMember -Function ConvertTo-HashMap
 Export-ModuleMember -Function Test-Compatibility

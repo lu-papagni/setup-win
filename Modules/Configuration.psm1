@@ -7,7 +7,7 @@ function Import-Settings {
     [string] $Path = (Resolve-Path '.')
   )
 
-  Write-Verbose "Lista programmi: $Programs"
+  Write-Verbose ("Lista programmi:", (ConvertTo-Json $Programs) -join ' ')
   Write-Verbose "Percorso configurazione: $Path"
 
   # Validazione directory configurazione
@@ -22,7 +22,7 @@ function Import-Settings {
     return
   }
 
-  Write-Verbose ("Chiavi di `$Programs: ", $Programs.PSObject.Properties.Name -join ' ')
+  Write-Verbose ("Chiavi di `$Programs: ", (ConvertTo-Json $Programs.PSObject.Properties.Name) -join ' ')
 
   $programDirNames = $Programs.PSObject.Properties.Name
 
@@ -44,7 +44,7 @@ function Import-Settings {
         # crea la cartella se non esiste
         if (-not (Test-Path -PathType Container -Path $linkDestDir)) {
           if ($PSCmdlet.ShouldProcess($linkDestDir, "Creazione directory")) {
-            New-Item -ItemType Directory -Path "$linkDestDir"
+            New-Item -ItemType Directory -Path $linkDestDir
           }
         } else {
           Write-Warning "Il percorso '$linkDestDir' esiste, non lo sovrascrivo."
@@ -63,8 +63,8 @@ function Import-Settings {
           $programAbsPath = Join-Path -Path $programSrcDir -ChildPath $fileName | Resolve-Path 
           $linkTargetPath = Join-Path -Path $linkDestDir -ChildPath $fileName
 
-          Write-Verbose "[${fileName}] => Percorso sorgente: $programAbsPath"
-          Write-Verbose "[${fileName}] => Percorso destinazione: $linkTargetPath"
+          Write-Verbose "[${fileName}] => Percorso sorgente: `"$programAbsPath`""
+          Write-Verbose "[${fileName}] => Percorso destinazione: `"$linkTargetPath`""
 
           if ($PSCmdlet.ShouldProcess($fileName, "Collegamento simbolico")) {
             New-Item -Path $linkTargetPath -Value $programAbsPath -ItemType SymbolicLink -Force

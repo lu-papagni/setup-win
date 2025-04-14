@@ -15,7 +15,7 @@ Test-Compatibility -ShellVersion 5
 # Solo powershell 7:
 # $scriptSettings = Get-Content -Raw "$Config" | ConvertFrom-Json -AsHashTable
 $scriptSettings = Get-Content -Raw "$Config" | ConvertFrom-Json
-$scriptSettings = Convert-JsonObject -Source $scriptSettings
+$scriptSettings = ConvertTo-HashMap -Source $scriptSettings
 $install = $scriptSettings.installPrograms
 $configure = $scriptSettings.configFiles
 
