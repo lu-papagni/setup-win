@@ -4,15 +4,15 @@ function Import-Settings {
     [ValidateNotNullOrEmpty()]
     $Programs,
 
-    [string] $ConfigPath = (Resolve-Path '.'),
+    [string] $Path = (Resolve-Path '.')
   )
 
-  $PSCmdlet.ShouldProcess((ConvertTo-Json $Programs), "Visualizzazione lista programmi")
-  $PSCmdlet.ShouldProcess($ConfigPath, "Visualizzazione percorso di configurazione")
+  Write-Verbose "Lista programmi: $Programs"
+  Write-Verbose "Percorso configurazione: $Path"
 
   # Validazione directory configurazione
-  if (-not (Test-Path -Path $ConfigPath -PathType Container)) {
-    Write-Error "'$ConfigPath' non è una directory valida!"
+  if (-not (Test-Path -Path $Path -PathType Container)) {
+    Write-Error "'$Path' non è una directory valida!"
     return
   }
 
@@ -22,17 +22,18 @@ function Import-Settings {
     return
   }
 
-  $PSCmdlet.ShouldProcess($Programs.PSObject.Properties.Name, "Visualizzazione chiavi di `$Programs")
+  Write-Verbose ("Chiavi di `$Programs: ", $Programs.PSObject.Properties.Name -join ' ')
 
   $programDirNames = $Programs.PSObject.Properties.Name
 
   # per ogni programma
   foreach ($program in $programDirNames) {
-    $programSrcDir = (Join-Path -Path $ConfigPath -ChildPath $program | Resolve-Path)
+    $programSrcDir = (Join-Path -Path $Path -ChildPath $program | Resolve-Path)
 
     if (Test-Path -Path $programSrcDir -PathType Container) {
       $targetList = $Programs.$program
-      $PSCmdlet.ShouldProcess($targetList, "Visualizzazione lista programmi")
+
+      Write-Verbose "Lista programmi: $targetList"
 
       # per ogni regola
       foreach ($target in $targetList) {
@@ -55,15 +56,15 @@ function Import-Settings {
           | Where-Object { $_.Name -match "$fileRegex" } `
           | Select-Object -ExpandProperty Name
 
-        $PSCmdlet.ShouldProcess($targetFiles, "Visualizzazione file da linkare")
+        Write-Verbose "File da linkare: $targetFiles"
 
         # per ogni nome file che corrisponde alla regola
         foreach ($fileName in $targetFiles) {
           $programAbsPath = Join-Path -Path $programSrcDir -ChildPath $fileName | Resolve-Path 
-          $linkTargetPath = Join-Path -Path $linkDestDir -ChildPath $fileName | Resolve-Path 
+          $linkTargetPath = Join-Path -Path $linkDestDir -ChildPath $fileName
 
-          $PSCmdlet.ShouldProcess($programAbsPath, "Visualizzazione percorso sorgente")
-          $PSCmdlet.ShouldProcess($linkTargetPath, "Visualizzazione percorso destinazione")
+          Write-Verbose "[${fileName}] => Percorso sorgente: $programAbsPath"
+          Write-Verbose "[${fileName}] => Percorso destinazione: $linkTargetPath"
 
           if ($PSCmdlet.ShouldProcess($fileName, "Collegamento simbolico")) {
             New-Item -Path $linkTargetPath -Value $programAbsPath -ItemType SymbolicLink -Force

@@ -33,7 +33,7 @@ function Install-Packages {
     [ValidateNotNullOrEmpty()]
     [string[]] $PackageList,
 
-    [string] $PackageListPath = "Packages",
+    [string] $PackageListPath = "Packages"
   )
 
   # Validazione percorso file di installazione
