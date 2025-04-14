@@ -1,16 +1,14 @@
 function Import-Settings {
+  [CmdletBinding(SupportsShouldProcess = $true)]
   param(
+    [ValidateNotNullOrEmpty()]
     $Programs,
-    [string]$ConfigPath = '.',
-    [bool]$Debug = $false
+
+    [string] $ConfigPath = (Resolve-Path '.'),
   )
 
-  if ($Debug) {
-    Write-Host -ForegroundColor Magenta "Contenuto di '`$Programs' = "
-    ConvertTo-Json $Programs | Write-Host -ForegroundColor Magenta
-    Write-Host -ForegroundColor Magenta "Contenuto di '`$ConfigPath' = "
-    Write-Host -ForegroundColor Magenta $ConfigPath
-  }
+  $PSCmdlet.ShouldProcess((ConvertTo-Json $Programs), "Visualizzazione lista programmi")
+  $PSCmdlet.ShouldProcess($ConfigPath, "Visualizzazione percorso di configurazione")
 
   # Validazione directory configurazione
   if (-not (Test-Path -Path $ConfigPath -PathType Container)) {
@@ -24,10 +22,7 @@ function Import-Settings {
     return
   }
 
-  if ($Debug) {
-    Write-Host -ForegroundColor Magenta "`$Programs = ", $Programs
-    Write-Host -ForegroundColor Magenta "`$Programs.PSObject.Properties.Name = ", $Programs.PSObject.Properties.Name
-  }
+  $PSCmdlet.ShouldProcess($Programs.PSObject.Properties.Name, "Visualizzazione chiavi di `$Programs")
 
   $programDirNames = $Programs.PSObject.Properties.Name
 
@@ -37,10 +32,7 @@ function Import-Settings {
 
     if (Test-Path -Path $programSrcDir -PathType Container) {
       $targetList = $Programs.$program
-
-      if ($Debug) {
-        Write-Host -ForegroundColor Magenta "`$targetList = ", $targetList
-      }
+      $PSCmdlet.ShouldProcess($targetList, "Visualizzazione lista programmi")
 
       # per ogni regola
       foreach ($target in $targetList) {
@@ -50,10 +42,8 @@ function Import-Settings {
 
         # crea la cartella se non esiste
         if (-not (Test-Path -PathType Container -Path $linkDestDir)) {
-          if (-not $Debug) {
+          if ($PSCmdlet.ShouldProcess($linkDestDir, "Creazione directory")) {
             New-Item -ItemType Directory -Path "$linkDestDir"
-          } else {
-            Write-Host -ForegroundColor Magenta "DEBUG: Avrei creato la directory '$linkDestDir'"
           }
         } else {
           Write-Warning "Il percorso '$linkDestDir' esiste, non lo sovrascrivo."
@@ -65,23 +55,18 @@ function Import-Settings {
           | Where-Object { $_.Name -match "$fileRegex" } `
           | Select-Object -ExpandProperty Name
 
-        if ($Debug) {
-          Write-Host -ForegroundColor Magenta "`$targetFiles = ", $targetFiles
-        }
+        $PSCmdlet.ShouldProcess($targetFiles, "Visualizzazione file da linkare")
 
         # per ogni nome file che corrisponde alla regola
         foreach ($fileName in $targetFiles) {
-          $programAbsPath = Resolve-Path "$programSrcDir\$fileName"
+          $programAbsPath = Join-Path -Path $programSrcDir -ChildPath $fileName | Resolve-Path 
+          $linkTargetPath = Join-Path -Path $linkDestDir -ChildPath $fileName | Resolve-Path 
 
-          if (-not $Debug) {
-            New-Item `
-              -Path "$linkDestDir\$fileName" `
-              -Value "$programAbsPath" `
-              -ItemType SymbolicLink `
-              -Force
-          } else {
-            Write-Host -ForegroundColor Magenta "DEBUG: Avrei linkato '$programAbsPath' a '$linkDestDir\$fileName'"
-            Write-Host -ForegroundColor Magenta ("DEBUG: `$linkDestDir = '$absRootDir' + '" + $target.destination + "'")
+          $PSCmdlet.ShouldProcess($programAbsPath, "Visualizzazione percorso sorgente")
+          $PSCmdlet.ShouldProcess($linkTargetPath, "Visualizzazione percorso destinazione")
+
+          if ($PSCmdlet.ShouldProcess($fileName, "Collegamento simbolico")) {
+            New-Item -Path $linkTargetPath -Value $programAbsPath -ItemType SymbolicLink -Force
           }
         }
       }

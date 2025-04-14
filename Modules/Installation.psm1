@@ -23,7 +23,7 @@ function Parse-PackageManagerArgs {
 }
 
 function Install-Packages {
-  [CmdletBinding()]
+  [CmdletBinding(SupportsShouldProcess = $true)]
   param(
     [Parameter(Mandatory = $true)]
     [ValidateNotNullOrEmpty()]
@@ -34,7 +34,6 @@ function Install-Packages {
     [string[]] $PackageList,
 
     [string] $PackageListPath = "Packages",
-    [bool] $Debug = $false
   )
 
   # Validazione percorso file di installazione
@@ -65,12 +64,8 @@ function Install-Packages {
                   "CAUSA: errori di sintassi nel comando del package manager."
     }
 
-    if (-not $Debug) {
-      Write-Host -ForegroundColor Green "Eseguo aggiornamento di tutti i pacchetti..."
+    if ($PSCmdlet.ShouldProcess($updateCmd, "Aggiornamento pacchetti")) {
       Invoke-Expression $updateCmd
-    } else {
-      Write-Host -ForegroundColor Magenta "Avrei eseguito aggiornamento di tutti i pacchetti", `
-                                          "CMD: $updateCmd"
     }
 
     # Installa i pacchetti mancanti
@@ -88,12 +83,8 @@ function Install-Packages {
                       "CAUSA: errori di sintassi nel comando del package manager."
         }
 
-        if (-not $Debug) {
-          Write-Host -ForegroundColor Green "Installo i pacchetti da '$packageList'"
+        if ($PSCmdlet.ShouldProcess($packageList, "Installazione pacchetti")) {
           Invoke-Expression $importCmd
-        } else {
-          Write-Host -ForegroundColor Magenta "Avrei installato i pacchetti da '$packageList'"
-          Write-Host -ForegroundColor Magenta "CMD: $importCmd"
         }
       } else {
         Write-Error "Impossibile trovare lista di installazione pacchetti."
