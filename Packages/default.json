@@ -10,8 +10,6 @@
         { "PackageIdentifier" : "Microsoft.PowerShell" },
         { "PackageIdentifier" : "WinFsp.WinFsp" },
         { "PackageIdentifier" : "Brave.Brave" },
-        { "PackageIdentifier" : "Discord.Discord" },
-        { "PackageIdentifier" : "Spotify.Spotify" },
         { "PackageIdentifier" : "Microsoft.WindowsTerminal" }
       ],
       "SourceDetails" : 
