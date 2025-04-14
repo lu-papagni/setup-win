@@ -12,34 +12,34 @@ function Import-Settings {
     Write-Host -ForegroundColor Magenta $ConfigPath
   }
 
+  # Validazione directory configurazione
   if (-not (Test-Path -Path $ConfigPath -PathType Container)) {
     Write-Error "'$ConfigPath' non è una directory valida!"
     return
   }
 
+  # Validazione lista programmi
   if ($Programs -eq $null) {
     Write-Error "Errore nella configurazione!"
     return
   }
 
   if ($Debug) {
-    Write-Host -ForegroundColor Magenta "`$Programs = "
-    Write-Host -ForegroundColor Magenta $Programs
-    Write-Host -ForegroundColor Magenta "`$Programs.PSObject.Properties.Name = "
-    Write-Host -ForegroundColor Magenta $Programs.PSObject.Properties.Name
+    Write-Host -ForegroundColor Magenta "`$Programs = ", $Programs
+    Write-Host -ForegroundColor Magenta "`$Programs.PSObject.Properties.Name = ", $Programs.PSObject.Properties.Name
   }
 
   $programDirNames = $Programs.PSObject.Properties.Name
 
   # per ogni programma
   foreach ($program in $programDirNames) {
-    if (Test-Path -Path "$ConfigPath\$program" -PathType Container) {
+    $programSrcDir = (Join-Path -Path $ConfigPath -ChildPath $program | Resolve-Path)
+
+    if (Test-Path -Path $programSrcDir -PathType Container) {
       $targetList = $Programs.$program
-      $programSrcDir = $ConfigPath, $program -join '\'
 
       if ($Debug) {
-        Write-Host -ForegroundColor Magenta "`$targetList = "
-        Write-Host -ForegroundColor Magenta $targetList
+        Write-Host -ForegroundColor Magenta "`$targetList = ", $targetList
       }
 
       # per ogni regola
@@ -66,8 +66,7 @@ function Import-Settings {
           | Select-Object -ExpandProperty Name
 
         if ($Debug) {
-          Write-Host -ForegroundColor Magenta "`$targetFiles = "
-          Write-Host -ForegroundColor Magenta $targetFiles
+          Write-Host -ForegroundColor Magenta "`$targetFiles = ", $targetFiles
         }
 
         # per ogni nome file che corrisponde alla regola
@@ -75,13 +74,16 @@ function Import-Settings {
           $programAbsPath = Resolve-Path "$programSrcDir\$fileName"
 
           if (-not $Debug) {
-            New-Item -ItemType SymbolicLink -Path "$linkDestDir\$fileName" -Value "$programAbsPath" -Force
+            New-Item `
+              -Path "$linkDestDir\$fileName" `
+              -Value "$programAbsPath" `
+              -ItemType SymbolicLink `
+              -Force
           } else {
             Write-Host -ForegroundColor Magenta "DEBUG: Avrei linkato '$programAbsPath' a '$linkDestDir\$fileName'"
             Write-Host -ForegroundColor Magenta ("DEBUG: `$linkDestDir = '$absRootDir' + '" + $target.destination + "'")
           }
         }
-
       }
     } else {
       Write-Error "Impossibile trovare le impostazioni di '$program'"

@@ -21,7 +21,7 @@ $configure = $scriptSettings.configFiles
 
 if ($install.enabled) {
   Write-Host -ForegroundColor Green "Inizio installazione programmi..."
-  Install-Packages -PackageList $install.lists -Debug $DryRun
+  Install-Packages -PackageManager $install.packageManager -PackageList $install.lists -Debug $DryRun
   Write-Host -ForegroundColor Green "Terminato!"
 } else {
   Write-Warning "Salto installazione dei pacchetti"
