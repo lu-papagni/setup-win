@@ -26,7 +26,7 @@ Non possono esserci:
 - Commenti
 - Virgole che non precedono un elemento (_trailing comma_)
 
-[!WARNING]
+> [!WARNING]
 > Un esempio di cosa NON fare.
 > ```json
 > {
@@ -102,11 +102,11 @@ I programmi verranno installati usando il package manager definito dall'utente.
     </tr>
 </table>
 
-[!NOTE]
+> [!NOTE]
 > I comandi del package manager possono essere resi modulari. In particolare, l'azione
 > `import` permette già di specificare un parametro posizionale `${0}`.
-> Al momento, questo sistema viene usato internamente per segnalare dove inserire il percorso
-> del file da cui importare i pacchetti.
+> Al momento, questo sistema viene [usato internamente](https://github.com/lu-papagni/setup-win/blob/f09e4559c35ac884ca1a9a4b15592f0d00029bc5/Modules/Installation.psm1)
+> per segnalare dove inserire il percorso del file da cui importare i pacchetti.
 > In generale questa soluzione può essere esposta per passare una serie di parametri, dove
 > il numero nel segnaposto rappresenta l'indice di una stringa nella lista in input.
 
