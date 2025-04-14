@@ -93,7 +93,7 @@ function Install-Packages {
       }
     }
   } else {
-    Write-Error ("Impossibile trovare il comando: " + $cmdInfo.Name)
+    Write-Error ("Package manager non trovato: " + $PackageManager.Name)
   }
 }
 
