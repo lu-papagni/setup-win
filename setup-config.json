@@ -1,0 +1,33 @@
+{
+  "dotfilesDir": "~/.dots-win",
+  "repository": {
+    "name": "lu-papagni/dots-win",
+    "type": "github"
+  },
+  "configFiles": {
+    "enabled": true,
+    "programs": {}
+  },
+  "installPrograms": {
+    "enabled": true,
+    "packageManager": {
+      "name": "winget",
+      "actions": {
+        "update": [
+          "upgrade",
+          "--all",
+          "--accept-package-agreements"
+        ],
+        "import": [
+          "import",
+          "-i",
+          "${0}",
+          "--accept-package-agreements"
+        ]
+      }
+    },
+    "lists": [
+      "default"
+    ]
+  }
+}
