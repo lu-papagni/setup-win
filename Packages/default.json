@@ -7,10 +7,9 @@
       [
         { "PackageIdentifier" : "EclipseAdoptium.Temurin.21.JDK" },
         { "PackageIdentifier" : "VideoLAN.VLC" },
-        { "PackageIdentifier" : "Microsoft.PowerShell" },
         { "PackageIdentifier" : "WinFsp.WinFsp" },
         { "PackageIdentifier" : "Brave.Brave" },
-        { "PackageIdentifier" : "Microsoft.WindowsTerminal" }
+        { "PackageIdentifier" : "KDE.Okular" },
       ],
       "SourceDetails" : 
       {

@@ -6,7 +6,7 @@
       "Packages" : 
       [
         { "PackageIdentifier" : "Git.Git" },
-        { "PackageIdentifier" : "Debian.Debian" },
+        { "PackageIdentifier" : "Microsoft.PowerShell" },
         { "PackageIdentifier" : "Microsoft.WindowsTerminal" },
       ],
       "SourceDetails" : 
