@@ -11,9 +11,8 @@ $setup = @{ Name='setup-win'; Dest='~/Documents/Repository' }
 
 foreach ($repo in $dotfiles, $setup) {
   $zipFile = Join-Path $env:TEMP "$($repo.Name).zip"
-  $outDest = Resolve-Path $repo.Dest
+  $outDest = $repo.Dest
   $repoAddress = ($github -f $repo.Name, $Branch)
-
 
   if ($PSCmdlet.ShouldProcess($repoAddress, "Download della repository")) {
     Invoke-RestMethod -Uri $repoAddress -OutFile $zipFile -ErrorAction Stop
