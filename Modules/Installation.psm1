@@ -33,7 +33,7 @@ function Install-Packages {
     [ValidateNotNullOrEmpty()]
     [string[]] $PackageList,
 
-    [string] $PackageListPath = "Packages"
+    [string] $PackageListPath = "$($MyInvocation.PSScriptRoot)\Packages"
   )
 
   # Validazione percorso file di installazione
@@ -70,7 +70,13 @@ function Install-Packages {
 
     # Installa i pacchetti mancanti
     foreach ($list in $PackageList) {
-      $packageList = Join-Path -Path $PackageListPath -ChildPath "$list.json" | Resolve-Path
+      try {
+        $listFullPath = Join-Path -Path $PackageListPath -ChildPath "$list.json" 
+        $packageList = $listFullPath | Resolve-Path -ErrorAction Stop
+      } catch {
+        Write-Error "Impossibile trovare la lista '$list' in $(Split-Path $listFullPath)"
+        continue
+      }
 
       if ($packageList -ne $null) {
         Write-Verbose "Trovata lista: `"$packageList`""

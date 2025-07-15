@@ -1,10 +1,11 @@
 function Import-Settings {
   [CmdletBinding(SupportsShouldProcess = $true)]
   param(
-    [ValidateNotNullOrEmpty()]
     $Programs,
 
-    [string] $Path = (Resolve-Path '.')
+    [Parameter(Mandatory=$true)]
+    [ValidateNotNullOrEmpty()]
+    [string] $Path
   )
 
   Write-Verbose ("Lista programmi:", (ConvertTo-Json $Programs) -join ' ')
@@ -13,12 +14,6 @@ function Import-Settings {
   # Validazione directory configurazione
   if (-not (Test-Path -Path $Path -PathType Container)) {
     Write-Error "'$Path' non è una directory valida!"
-    return
-  }
-
-  # Validazione lista programmi
-  if ($Programs -eq $null) {
-    Write-Error "Errore nella configurazione!"
     return
   }
 
@@ -33,7 +28,7 @@ function Import-Settings {
     if (Test-Path -Path $programSrcDir -PathType Container) {
       $targetList = $Programs.$program
 
-      Write-Verbose "Lista programmi: $targetList"
+      # Write-Verbose "Lista programmi: $targetList"
 
       # per ogni regola
       foreach ($target in $targetList) {
@@ -47,7 +42,7 @@ function Import-Settings {
             New-Item -ItemType Directory -Path $linkDestDir
           }
         } else {
-          Write-Warning "Il percorso '$linkDestDir' esiste, non lo sovrascrivo."
+          Write-Verbose "Il percorso '$linkDestDir' esiste, non lo sovrascrivo."
         }
 
         # ottieni nomi file
@@ -63,8 +58,7 @@ function Import-Settings {
           $programAbsPath = Join-Path -Path $programSrcDir -ChildPath $fileName | Resolve-Path 
           $linkTargetPath = Join-Path -Path $linkDestDir -ChildPath $fileName
 
-          Write-Verbose "[${fileName}] => Percorso sorgente: `"$programAbsPath`""
-          Write-Verbose "[${fileName}] => Percorso destinazione: `"$linkTargetPath`""
+          Write-Host -ForegroundColor Blue "[${fileName}]: '$programAbsPath' => '$linkTargetPath'"
 
           if ($PSCmdlet.ShouldProcess($fileName, "Collegamento simbolico")) {
             New-Item -Path $linkTargetPath -Value $programAbsPath -ItemType SymbolicLink -Force
