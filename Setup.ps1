@@ -85,7 +85,11 @@ if ($selectedFeatures.Length -eq 0) {
 # Esecuzione
 if ([SetupAction]::Install -in $selectedFeatures) {
   Write-Host -ForegroundColor Green "Inizio installazione programmi..."
-  Install-Packages -PackageManager $install.packageManager -PackageList $install.lists -WhatIf:$DryRun -Verbose:$DryRun
+  Install-Packages `
+    -PackageManager $install.packageManager `
+    -PackageCollections $install.lists `
+    -WhatIf:$DryRun `
+    -Verbose:$DryRun
   Write-Host -ForegroundColor Green "Terminato!"
 } else {
   Write-Warning "Salto installazione dei pacchetti"

@@ -31,16 +31,17 @@ function Install-Packages {
 
     [Parameter(Mandatory = $true)]
     [ValidateNotNullOrEmpty()]
-    [string[]] $PackageList,
+    [string[]] $PackageCollections,
 
-    [string] $PackageListPath = "$($MyInvocation.PSScriptRoot)\Packages"
+    [ValidateNotNullOrEmpty()]
+    [string] $CollectionsPath = "$($MyInvocation.PSScriptRoot)\Packages"
   )
 
   # Validazione percorso file di installazione
-  if (Test-Path $PackageListPath -PathType Container) {
-    $PackageListPath = Resolve-Path $PackageListPath
+  if (Test-Path $CollectionsPath -PathType Container) {
+    $CollectionsPath = Resolve-Path $CollectionsPath
   } else {
-    Write-Error "Il percorso ``$PackageListPath`` non è valido."
+    Write-Error "Il percorso ``$CollectionsPath`` non è valido."
     return
   }
 
@@ -69,22 +70,22 @@ function Install-Packages {
     }
 
     # Installa i pacchetti mancanti
-    foreach ($list in $PackageList) {
+    foreach ($collectionName in $PackageCollections) {
       try {
-        $listFullPath = Join-Path -Path $PackageListPath -ChildPath "$list.json" 
-        $packageList = $listFullPath | Resolve-Path -ErrorAction Stop
+        $collectionFile = Join-Path -Path $CollectionsPath -ChildPath "$collectionName.json" 
+        $collectionFullPath = $collectionFile | Resolve-Path -ErrorAction Stop
       } catch {
-        Write-Error "Impossibile trovare la lista '$list' in $(Split-Path $listFullPath)"
+        Write-Error "Impossibile trovare la lista '$collectionName' in $(Split-Path $collectionFile)"
         continue
       }
 
-      if ($packageList -ne $null) {
-        Write-Verbose "Trovata lista: `"$packageList`""
+      if ($collectionFullPath -ne $null) {
+        Write-Verbose "Trovata lista: '$collectionFullPath'"
 
         try {
           $importArgs = Parse-PackageManagerArgs `
                         -CommandList $PackageManager.actions.import `
-                        -Substitute @( "$packageList" )
+                        -Substitute @( "$collectionFullPath" )
           $importCmd = $manager, $importArgs -join ' '
         } catch {
           Write-Error ("Non è stato possibile importare i pacchetti desiderati." + `
