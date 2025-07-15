@@ -5,14 +5,14 @@ param (
 )
 
 $github = "https://github.com/lu-papagni/{0}/archive/{1}.zip"
-$zipSuffix = "-$Branch"
-$dotfiles = @{ Name='dots-win'; Dest='~' }
-$setup = @{ Name='setup-win'; Dest='~/Documents/Repository' }
+$dotfiles = @{ Name='dots-win'; Dest='~'; Branch='main' }
+$setup = @{ Name='setup-win'; Dest='~/Documents/Repository'; Branch=$Branch }
 
 foreach ($repo in $dotfiles, $setup) {
   $zipFile = Join-Path $env:TEMP "$($repo.Name).zip"
   $outDest = $repo.Dest
-  $repoAddress = ($github -f $repo.Name, $Branch)
+  $repoAddress = ($github -f $repo.Name, $repo.Branch)
+  $zipSuffix = "-$($repo.Branch)"
 
   if ($PSCmdlet.ShouldProcess($repoAddress, "Download della repository")) {
     Invoke-RestMethod -Uri $repoAddress -OutFile $zipFile -ErrorAction Stop
@@ -41,14 +41,14 @@ if ($shouldRunSetup -match '[sSyY]') {
   $setupDest = Join-Path $setup.Dest $setup.Name
   $script = Join-Path $setupDest 'Setup.ps1'
 
-  $dotfilesDest = Join-Path $dotfiles.Dest $dotfiles.Name
-  $configuration = Join-Path $dotfilesDest 'setup-config.json'
+  $dotfilesPath = Join-Path $dotfiles.Dest $dotfiles.Name
+  $configuration = Join-Path $dotfilesPath 'setup-config.json'
 
   if ($PSCmdlet.ShouldProcess(@($script, $configuration) -join ';', "Risoluzione percorso assoluto")) {
     $script, $configuration = Resolve-Path $script, $configuration -ErrorAction Stop
   }
 
-  $scriptArgs = '-NoProfile', $script, '-Config', $configuration, '-Dotfiles', $dotfilesDest
+  $scriptArgs = '-NoProfile', $script, '-Config', $configuration, '-Dotfiles', $dotfilesPath
 
   if ($PSCmdlet.ShouldProcess($scriptArgs, "Avvio processo di installazione come amministratore")) {
     Write-Host -ForegroundColor Green 'Inizio installazione.'
