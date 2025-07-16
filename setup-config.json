@@ -21,8 +21,8 @@
         ]
       }
     },
-    "lists": [
-      "default"
-    ]
+    "collections": {
+      "get": ["default"]
+    }
   }
 }
