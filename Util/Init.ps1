@@ -5,8 +5,18 @@ param (
 )
 
 $github = "https://github.com/lu-papagni/{0}/archive/{1}.zip"
-$dotfiles = @{ Name='dots-win'; Dest='~'; Branch='main' }
-$setup = @{ Name='setup-win'; Dest='~/Documents/Repository'; Branch=$Branch }
+$dotfiles = @{
+  Name='dots-win';
+  Dest='~';
+  Branch='main';
+  RenameFolder='.dots-win'
+}
+$setup = @{
+  Name='setup-win';
+  Dest='~/Documents/Repository';
+  Branch=$Branch;
+  RenameFolder='setup-win'
+}
 
 foreach ($repo in $dotfiles, $setup) {
   $zipFile = Join-Path $env:TEMP "$($repo.Name).zip"
@@ -25,7 +35,9 @@ foreach ($repo in $dotfiles, $setup) {
 
   $extractedDir = (Join-Path $outDest -ChildPath "$($repo.Name)$zipSuffix")
   if ($PSCmdlet.ShouldProcess($extractedDir, "Ridenominazione directory estratta")) {
-    mv $extractedDir ($extractedDir -replace $zipSuffix, '')
+    if ($repo.RenameFolder) {
+      mv $extractedDir (Join-Path (Split-Path -Parent $extractedDir) $repo.RenameFolder)
+    }
   }
 }
 
@@ -38,10 +50,18 @@ if ($PSCmdlet.ShouldProcess("Conferma di avvio")) {
 }
 
 if ($shouldRunSetup -match '[sSyY]') {
-  $setupDest = Join-Path $setup.Dest $setup.Name
-  $script = Join-Path $setupDest 'Setup.ps1'
+  if ($setup.RenameFolder) {
+    $setupPath = Join-Path $setup.Dest $setup.RenameFolder
+  } else {
+    $setupPath = Join-Path $setup.Dest $setup.Name
+  }
+  $script = Join-Path $setupPath 'Setup.ps1'
 
-  $dotfilesPath = Join-Path $dotfiles.Dest $dotfiles.Name
+  if ($dotfiles.RenameFolder) {
+    $dotfilesPath = Join-Path $dotfiles.Dest $dotfiles.RenameFolder
+  } else {
+    $dotfilesPath = Join-Path $dotfiles.Dest $dotfiles.Name
+  }
   $configuration = Join-Path $dotfilesPath 'setup-config.json'
 
   if ($PSCmdlet.ShouldProcess(@($script, $configuration) -join ';', "Risoluzione percorso assoluto")) {
