@@ -1,16 +1,16 @@
 param(
   [ValidateNotNullOrEmpty()]
-  [string]$Config = "$(Split-Path $MyInvocation.InvocationName)\setup-config.json",
+  [string]$Config = "$PSScriptRoot\setup-config.json",
 
   [ValidateNotNullOrEmpty()]
-  [string]$Dotfiles = "$($env:USERPROFILE)\dots-win",
+  [string]$Dotfiles = "$env:USERPROFILE\dots-win",
 
   [switch]$DryRun,
   [string[]]$Only
 )
 
 # Importo moduli
-Set-Variable MODULE_PATH -Value (Join-Path -Path (Split-Path $MyInvocation.InvocationName) -ChildPath "Modules") -Option ReadOnly
+Set-Variable MODULE_PATH -Value (Join-Path -Path $PSScriptRoot -ChildPath "Modules") -Option ReadOnly
 try {
   Import-Module -Name (Join-Path -Path $MODULE_PATH -ChildPath "Configuration.psm1")
   Import-Module -Name (Join-Path -Path $MODULE_PATH -ChildPath "Installation.psm1")
