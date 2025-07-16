@@ -41,9 +41,11 @@ function Install-Packages {
   if (Test-Path $CollectionsPath -PathType Container) {
     $CollectionsPath = Resolve-Path $CollectionsPath
   } else {
-    Write-Error "Il percorso ``$CollectionsPath`` non è valido."
-    return
+    $CollectionsPath = "$($MyInvocation.PSScriptRoot)\Packages"
+    Write-Error "Percorso '$CollectionsPath' non valido. Continuare con il percorso di default?" -ErrorAction Inquire
   }
+
+  Write-Verbose "Collezioni individuate in: '$CollectionsPath'"
 
   # Controllo dell'installazione del package manager
   if ($PackageManager.name -eq $null) {
@@ -53,6 +55,7 @@ function Install-Packages {
 
   $cmdInfo = Get-Command $PackageManager.name -ErrorAction SilentlyContinue
 
+  # Se il package manager è eseguibile
   if ($cmdInfo -ne $null -and $cmdInfo.CommandType -eq 'Application') {
     $manager = $cmdInfo.Source
 
@@ -67,6 +70,10 @@ function Install-Packages {
 
     if ($PSCmdlet.ShouldProcess($updateCmd, "Aggiornamento pacchetti")) {
       Invoke-Expression $updateCmd
+    }
+
+    if ($PackageCollections.Length -eq 0) {
+      Write-Host -ForegroundColor Magenta 'Nessun nuovo pacchetto da installare.'
     }
 
     # Installa i pacchetti mancanti

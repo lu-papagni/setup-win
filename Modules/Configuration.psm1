@@ -22,6 +22,10 @@ function Import-Settings {
   # Nomi delle cartelle corrispondenti ai nomi dei software di cui si vuole importare la configurazione
   $softwareConfigDirNames = $Programs.PSObject.Properties.Name
 
+  if ($softwareConfigDirNames.Length -eq 0) {
+    Write-Host -ForegroundColor Magenta 'Nessuna configurazione da importare.'
+  }
+
   foreach ($configName in $softwareConfigDirNames) {
     $configAbsolutePath = Join-Path -Path $Path -ChildPath $configName | Resolve-Path
 

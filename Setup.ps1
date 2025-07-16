@@ -9,11 +9,6 @@ param(
   [string[]]$Only
 )
 
-enum SetupAction {
-  Install
-  Import
-}
-
 # Importo moduli
 Set-Variable MODULE_PATH -Value (Join-Path -Path (Split-Path $MyInvocation.InvocationName) -ChildPath "Modules") -Option ReadOnly
 try {
@@ -28,27 +23,13 @@ try {
 # Esce se powershell non è almeno versione 5.0
 Test-Compatibility -ShellVersion 5
 
-# Validazione percorso del file di configurazione
 $settingsPath = @{
   User = $Config;
   Default = (Get-ConfigurationPath)
 }
 
-while (-not (Test-Path $settingsPath.User)) {
-  Write-Warning "File di configurazione inesistente: '$($settingsPath.User)'"
-  $selectedPath = Get-PickedFile -FileTypes @{ Description='JSON'; Extension='json' } -Title 'Seleziona file di configurazione'
-
-  if ($selectedPath) {
-    $settingsPath.User = $selectedPath
-  } else {
-    $wantToExit = (Read-Host -Prompt 'Non hai selezionato nulla. Uso configurazione di default? [S/N]') -match '[sSyY]'
-    if ($wantToExit) { $settingsPath.User = $settingsPath.Default }
-  }
-}
-
-if (-not $settingsPath.User) {
-  Write-Error "Impossibile trovare file di configurazione" -ErrorAction Stop
-}
+# Validazione percorso del file di configurazione
+$settingsPath.User = Get-ValidatedConfigPath -UserConfigPath $settingsPath.User -DefaultConfigPath $settingsPath.Default
 
 Write-Host -ForegroundColor Magenta "Configurazione utente: $($settingsPath.User)"
 
@@ -63,35 +44,22 @@ try {
   Write-Error 'Errore durante la lettura della configurazione' -ErrorAction Stop
 }
 
-# Capisco il sotto-insieme di operazioni che lo script deve compiere 
-[SetupAction[]] $selectedFeatures = @()
-
-foreach ($action in $Only) {
-  try {
-    $selectedFeatures += [SetupAction]($action)
-  } catch {
-    Write-Error "Impossibile eseguire '$action': azione non riconosciuta."
-  }
-}
+$selectedFeatures = Get-SelectedActions -OnlyActions $Only -Settings $scriptSettings
 
 $install = $scriptSettings.installPrograms
 $configure = $scriptSettings.configFiles
 
-if ($selectedFeatures.Length -eq 0) {
-  if ($install.enabled) { $selectedFeatures += [SetupAction]::Install } 
-  if ($configure.enabled) { $selectedFeatures += [SetupAction]::Import } 
-}
-
-# Esecuzione
+# Installazione pacchetti
 if ([SetupAction]::Install -in $selectedFeatures) {
   $arguments = @{
     PackageManager=$install.packageManager;
-    PackageCollections=$install.lists;
+    PackageCollections=$install.collections.get;
     WhatIf=$DryRun;
     Verbose=$DryRun
   }
 
-  if ($install.collectionsPath) { $arguments.CollectionsPath=$install.collectionsPath }
+  $collections = Get-CollectionsPath $install.collections.path
+  if ($collections) { $arguments.CollectionsPath = $collections }
 
   Write-Host -ForegroundColor Green "Inizio installazione programmi..."
   Install-Packages @arguments
@@ -100,6 +68,7 @@ if ([SetupAction]::Install -in $selectedFeatures) {
   Write-Warning "Salto installazione dei pacchetti"
 }
 
+# Importazione dei file di configurazione
 if ([SetupAction]::Import -in $selectedFeatures) {
   $dotfilesPath = Resolve-Path $Dotfiles
   Write-Host -ForegroundColor Green "Inizio importazione configurazione..."
