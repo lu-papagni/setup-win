@@ -6,7 +6,7 @@
       "Packages" : 
       [
         { "PackageIdentifier" : "Discord.Discord" },
-        { "PackageIdentifier" : "Spotify.Spotify" }
+        { "PackageIdentifier" : "Spotify.Spotify" },
         { "PackageIdentifier" : "9NKSQGP7F2NH" }
       ],
       "SourceDetails" : 
