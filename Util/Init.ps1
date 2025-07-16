@@ -1,20 +1,23 @@
 [CmdletBinding(SupportsShouldProcess = $true)]
 param (
   [ValidateNotNullOrEmpty()]
-  [string] $Branch = 'main'
+  [string] $DotsBranch = 'main',
+
+  [ValidateNotNullOrEmpty()]
+  [string] $SetupBranch = 'main'
 )
 
 $github = "https://github.com/lu-papagni/{0}/archive/{1}.zip"
 $dotfiles = @{
   Name='dots-win';
   Dest='~';
-  Branch='main';
+  Branch=$DotsBranch;
   RenameFolder='.dots-win'
 }
 $setup = @{
   Name='setup-win';
   Dest='~/Documents/Repository';
-  Branch=$Branch;
+  Branch=$SetupBranch;
   RenameFolder='setup-win'
 }
 
