@@ -33,6 +33,10 @@ function Install-Packages {
     [ValidateNotNullOrEmpty()]
     [string[]] $PackageCollections,
 
+    [Parameter(Mandatory = $true)]
+    [ValidateNotNullOrEmpty()]
+    [string] $CollectionType,
+
     [ValidateNotNullOrEmpty()]
     [string] $CollectionsPath = "$($MyInvocation.PSScriptRoot)\Packages"
   )
@@ -79,7 +83,7 @@ function Install-Packages {
     # Installa i pacchetti mancanti
     foreach ($collectionName in $PackageCollections) {
       try {
-        $collectionFile = Join-Path -Path $CollectionsPath -ChildPath "$collectionName.json" 
+        $collectionFile = Join-Path -Path $CollectionsPath -ChildPath "$collectionName.$CollectionType" 
         $collectionFullPath = $collectionFile | Resolve-Path -ErrorAction Stop
       } catch {
         Write-Error "Impossibile trovare la lista '$collectionName' in $(Split-Path $collectionFile)"

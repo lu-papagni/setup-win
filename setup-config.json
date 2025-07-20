@@ -14,14 +14,16 @@
           "--accept-package-agreements"
         ],
         "import": [
-          "import",
-          "-i",
-          "${0}",
-          "--accept-package-agreements"
+          "configure",
+          "--accept-configuration-agreements",
+          "-f",
+          "${0}"
         ]
       }
     },
     "collections": {
+      "type": "winget",
+      "path": true,
       "get": ["default"]
     }
   }

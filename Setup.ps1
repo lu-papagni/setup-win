@@ -6,6 +6,8 @@ param(
   [string]$Dotfiles = "$env:USERPROFILE\dots-win",
 
   [switch]$DryRun,
+
+  [ValidateSet('Install', 'Import')]
   [string[]]$Only
 )
 
@@ -54,6 +56,7 @@ if ([SetupAction]::Install -in $selectedFeatures) {
   $arguments = @{
     PackageManager=$install.packageManager;
     PackageCollections=$install.collections.get;
+    CollectionType=$install.collections.type;
     WhatIf=$DryRun;
     Verbose=$DryRun
   }
