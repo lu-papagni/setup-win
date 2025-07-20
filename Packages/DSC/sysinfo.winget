@@ -1,0 +1,25 @@
+# System monitoring and information tools
+properties:
+  configurationVersion: 0.2.0
+  resources:
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      directives:
+        description: Install CPU-Z for system hardware information
+        allowPrerelease: true
+      settings:
+        id: CPUID.CPU-Z
+        source: winget
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      directives:
+        description: Install MSI Afterburner for GPU monitoring
+        allowPrerelease: true
+      settings:
+        id: Guru3D.Afterburner
+        source: winget
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      directives:
+        description: Install RivaTuner Statistics Server for performance monitoring
+        allowPrerelease: true
+      settings:
+        id: Guru3D.RTSS
+        source: winget

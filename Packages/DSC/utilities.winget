@@ -1,0 +1,53 @@
+# Various utility tools
+properties:
+  configurationVersion: 0.2.0
+  resources:
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      directives:
+        description: Install WizTree for disk space analysis
+        allowPrerelease: true
+      settings:
+        id: AntibodySoftware.WizTree
+        source: winget
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      directives:
+        description: Install Revo Uninstaller for complete software removal
+        allowPrerelease: true
+      settings:
+        id: RevoUninstaller.RevoUninstaller
+        source: winget
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      directives:
+        description: Install Rclone for cloud storage management
+        allowPrerelease: true
+      settings:
+        id: Rclone.Rclone
+        source: winget
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      directives:
+        description: Install NAPS2 for document scanning
+        allowPrerelease: true
+      settings:
+        id: Cyanfish.NAPS2
+        source: winget
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      directives:
+        description: Install Microsoft PowerToys for Windows utilities
+        allowPrerelease: true
+      settings:
+        id: Microsoft.PowerToys
+        source: winget
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      directives:
+        description: Install AnyBurn for disc burning
+        allowPrerelease: true
+      settings:
+        id: PowerSoftware.AnyBurn
+        source: winget
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      directives:
+        description: Install Rufus for USB drive formatting
+        allowPrerelease: true
+      settings:
+        id: Rufus.Rufus
+        source: winget
