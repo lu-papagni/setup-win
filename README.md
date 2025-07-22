@@ -127,24 +127,6 @@ I nomi delle sotto-cartelle:
 - non sono legati al nome reale del programma
 - costituiscono un ID che potrà essere usato per riferirsi agli elementi in essa contenuti
 
-Esempio pratico:
-```
-<collections.path>
-│
-├───programma1
-│       file1
-│       file2
-│
-├───programma2
-│   │   file3
-│   │
-│   └───sotto_cartella21
-│       └───sotto_cartella211
-│               file4
-...
-
-```
-
 | Attributo | Tipo | Descrizione |
 |---|---|---|
 | enabled | `Boolean` | Determina se la funzionalità è abilitata. |
@@ -161,3 +143,65 @@ Esempio pratico:
 | name | `RegEx` | Identifica uno o più elementi da prendere come bersaglio per essere collegati nella directory specificata.<br> Usare solo espressioni regolari compatibili con .NET (C#) |
 | root | `String` | Variabile d'ambiente che contiene un percorso di sistema.<br> Ad esempio: `USERPROFILE`, `APPDATA`, ecc. |
 | destination | `String` | Percorso che identifica una sotto-cartella relativamente a quella dell'attributo `root`. Se non esiste verrà creata. |
+
+Ad esempio, per una cartella con questa struttura:
+```
+<Dotfiles>
+│
+├───programma1
+│       file1.a
+│       file2.b
+│
+├───programma2
+│   │   file3
+│   │
+│   └───sottocartella21
+│       └───sottocartella211
+│               file4
+...
+
+```
+Una possibile configurazione sarà:
+```json
+{
+    "configFiles": {
+        "programma1": [
+            {
+                "root": "PROGRAMFILES",
+                "destination": "programma1\\a",
+                "name": "\\w*\\.a"
+            },
+            {
+                "root": "PROGRAMFILES",
+                "destination": "programma1\\b",
+                "name": "\\w*\\.b"
+            }
+        ],
+        "programma2": [
+            {
+                "root": "PROGRAMFILES(X86)",
+                "destination": "programma2",
+                "name": "file3"
+            }
+        ],
+        "programma2/sottocartella21": [
+            {
+                "root": "APPDATA",
+                "destination": "programma2",
+                "name": "sottocartella\\d+"
+            }
+        ]
+    }
+}
+```
+Risultato:
+- Collega tutti i file `.a` in `programma1` nella sotto-cartella `a` in `%PROGRAMFILES%\programma1`; analogamente per i file `.b`.
+- Collega `file3` in `%PROGRAMFILES(x86)%\programma2`.
+- Collega tutte le cartelle che iniziano per `sottocartella` e terminano con un numero presenti in `programma2\sottocartella21`
+nella destinazione `%APPDATA%\programma2`.
+L'operazione non è ricorsiva, infatti viene creato semplicemente un riferimento alla vera cartella.
+
+> [!TIP]
+> Nei percorsi è indifferente usare il forward slash o il backslash. Tuttavia, usando il backslash, è necessario
+> scriverlo come `\\` perché il singolo `\` è il carattere di escape del JSON.
+
