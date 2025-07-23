@@ -1,0 +1,30 @@
+{
+  "configFiles": {
+    "enabled": true,
+    "programs": {}
+  },
+  "installPrograms": {
+    "enabled": true,
+    "packageManager": {
+      "name": "winget",
+      "actions": {
+        "update": [
+          "upgrade",
+          "--all",
+          "--accept-package-agreements"
+        ],
+        "import": [
+          "configure",
+          "--accept-configuration-agreements",
+          "-f",
+          "${0}"
+        ]
+      }
+    },
+    "collections": {
+      "type": "winget",
+      "path": true,
+      "get": ["default"]
+    }
+  }
+}

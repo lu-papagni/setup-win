@@ -31,18 +31,25 @@ function Install-Packages {
 
     [Parameter(Mandatory = $true)]
     [ValidateNotNullOrEmpty()]
-    [string[]] $PackageList,
+    [string[]] $PackageCollections,
 
-    [string] $PackageListPath = "Packages"
+    [Parameter(Mandatory = $true)]
+    [ValidateNotNullOrEmpty()]
+    [string] $CollectionType,
+
+    [ValidateNotNullOrEmpty()]
+    [string] $CollectionsPath = "$($MyInvocation.PSScriptRoot)\Packages"
   )
 
   # Validazione percorso file di installazione
-  if (Test-Path $PackageListPath -PathType Container) {
-    $PackageListPath = Resolve-Path $PackageListPath
+  if (Test-Path $CollectionsPath -PathType Container) {
+    $CollectionsPath = Resolve-Path $CollectionsPath
   } else {
-    Write-Error "Il percorso ``$PackageListPath`` non è valido."
-    return
+    $CollectionsPath = "$($MyInvocation.PSScriptRoot)\Packages"
+    Write-Error "Percorso '$CollectionsPath' non valido. Continuare con il percorso di default?" -ErrorAction Inquire
   }
+
+  Write-Verbose "Collezioni individuate in: '$CollectionsPath'"
 
   # Controllo dell'installazione del package manager
   if ($PackageManager.name -eq $null) {
@@ -52,6 +59,7 @@ function Install-Packages {
 
   $cmdInfo = Get-Command $PackageManager.name -ErrorAction SilentlyContinue
 
+  # Se il package manager è eseguibile
   if ($cmdInfo -ne $null -and $cmdInfo.CommandType -eq 'Application') {
     $manager = $cmdInfo.Source
 
@@ -68,17 +76,27 @@ function Install-Packages {
       Invoke-Expression $updateCmd
     }
 
-    # Installa i pacchetti mancanti
-    foreach ($list in $PackageList) {
-      $packageList = Join-Path -Path $PackageListPath -ChildPath "$list.json" | Resolve-Path
+    if ($PackageCollections.Length -eq 0) {
+      Write-Host -ForegroundColor Magenta 'Nessun nuovo pacchetto da installare.'
+    }
 
-      if ($packageList -ne $null) {
-        Write-Verbose "Trovata lista: `"$packageList`""
+    # Installa i pacchetti mancanti
+    foreach ($collectionName in $PackageCollections) {
+      try {
+        $collectionFile = Join-Path -Path $CollectionsPath -ChildPath "$collectionName.$CollectionType" 
+        $collectionFullPath = $collectionFile | Resolve-Path -ErrorAction Stop
+      } catch {
+        Write-Error "Impossibile trovare la lista '$collectionName' in $(Split-Path $collectionFile)"
+        continue
+      }
+
+      if ($collectionFullPath -ne $null) {
+        Write-Verbose "Trovata lista: '$collectionFullPath'"
 
         try {
           $importArgs = Parse-PackageManagerArgs `
                         -CommandList $PackageManager.actions.import `
-                        -Substitute @( "$packageList" )
+                        -Substitute @( "$collectionFullPath" )
           $importCmd = $manager, $importArgs -join ' '
         } catch {
           Write-Error ("Non è stato possibile importare i pacchetti desiderati." + `

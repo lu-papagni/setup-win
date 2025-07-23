@@ -1,0 +1,46 @@
+# Neovim and related tools
+properties:
+  configurationVersion: 0.2.0
+  resources:
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      directives:
+        description: Install Neovim as modern Vim replacement
+        allowPrerelease: true
+      settings:
+        id: Neovim.Neovim
+        source: winget
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      directives:
+        description: Install Neovide GUI for Neovim
+        allowPrerelease: true
+      settings:
+        id: Neovide.Neovide
+        source: winget
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      directives:
+        description: Install fzf for fuzzy finding
+        allowPrerelease: true
+      settings:
+        id: junegunn.fzf
+        source: winget
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      directives:
+        description: Install ripgrep for fast code searching
+        allowPrerelease: true
+      settings:
+        id: BurntSushi.ripgrep.MSVC
+        source: winget
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      directives:
+        description: Install bat for syntax highlighted cat
+        allowPrerelease: true
+      settings:
+        id: sharkdp.bat
+        source: winget
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      directives:
+        description: Install gcc for treesitter parser compilation
+        allowPrerelease: true
+      settings:
+        id: BrechtSanders.WinLibs.POSIX.UCRT
+        source: winget

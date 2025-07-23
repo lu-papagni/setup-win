@@ -1,10 +1,11 @@
 function Import-Settings {
   [CmdletBinding(SupportsShouldProcess = $true)]
   param(
-    [ValidateNotNullOrEmpty()]
     $Programs,
 
-    [string] $Path = (Resolve-Path '.')
+    [Parameter(Mandatory=$true)]
+    [ValidateNotNullOrEmpty()]
+    [string] $Path
   )
 
   Write-Verbose ("Lista programmi:", (ConvertTo-Json $Programs) -join ' ')
@@ -16,63 +17,59 @@ function Import-Settings {
     return
   }
 
-  # Validazione lista programmi
-  if ($Programs -eq $null) {
-    Write-Error "Errore nella configurazione!"
-    return
-  }
-
   Write-Verbose ("Chiavi di `$Programs: ", (ConvertTo-Json $Programs.PSObject.Properties.Name) -join ' ')
 
-  $programDirNames = $Programs.PSObject.Properties.Name
+  # Nomi delle cartelle corrispondenti ai nomi dei software di cui si vuole importare la configurazione
+  $softwareConfigDirNames = $Programs.PSObject.Properties.Name
 
-  # per ogni programma
-  foreach ($program in $programDirNames) {
-    $programSrcDir = (Join-Path -Path $Path -ChildPath $program | Resolve-Path)
+  if ($softwareConfigDirNames.Length -eq 0) {
+    Write-Host -ForegroundColor Magenta 'Nessuna configurazione da importare.'
+  }
 
-    if (Test-Path -Path $programSrcDir -PathType Container) {
-      $targetList = $Programs.$program
+  foreach ($configName in $softwareConfigDirNames) {
+    $configAbsolutePath = Join-Path -Path $Path -ChildPath $configName | Resolve-Path
 
-      Write-Verbose "Lista programmi: $targetList"
+    if (Test-Path -Path $configAbsolutePath -PathType Container) {
+      $targetList = $Programs.$configName
 
-      # per ogni regola
+      # Per ogni bersaglio indicato per un certo software
+      # trovo gli elementi che corrispondono all'espressione regolare fornita e la destinazione ad essi associata
       foreach ($target in $targetList) {
-        $fileRegex = $target.name
-        $absRootDir = Get-Item -Path ("Env:\" + $target.root) | Select-Object -ExpandProperty Value
-        $linkDestDir = Join-Path $absRootDir $target.destination
+        $targetRegex = $target.name
+        $linkBasePath = Get-Item -Path ("Env:\" + $target.root) | Select-Object -ExpandProperty Value
+        $linkDestinationDir = Join-Path $linkBasePath $target.destination
 
-        # crea la cartella se non esiste
-        if (-not (Test-Path -PathType Container -Path $linkDestDir)) {
-          if ($PSCmdlet.ShouldProcess($linkDestDir, "Creazione directory")) {
-            New-Item -ItemType Directory -Path $linkDestDir
+        # Creo la cartella di destinazione se non esiste
+        if (-not (Test-Path -PathType Container -Path $linkDestinationDir)) {
+          if ($PSCmdlet.ShouldProcess($linkDestinationDir, "Creazione directory")) {
+            New-Item -ItemType Directory -Path $linkDestinationDir
           }
         } else {
-          Write-Warning "Il percorso '$linkDestDir' esiste, non lo sovrascrivo."
+          Write-Verbose "Il percorso '$linkDestinationDir' esiste, non lo sovrascrivo."
         }
 
-        # ottieni nomi file
-        $targetFiles = Resolve-Path "$programSrcDir" `
+        # Ottengo i nomi degli oggetti
+        $itemsToBeLinked = Resolve-Path "$configAbsolutePath" `
           | Get-ChildItem `
-          | Where-Object { $_.Name -match "$fileRegex" } `
+          | Where-Object { $_.Name -match "$targetRegex" } `
           | Select-Object -ExpandProperty Name
 
-        Write-Verbose "File da linkare: $targetFiles"
+        Write-Verbose "Oggetti da linkare: $itemsToBeLinked"
 
-        # per ogni nome file che corrisponde alla regola
-        foreach ($fileName in $targetFiles) {
-          $programAbsPath = Join-Path -Path $programSrcDir -ChildPath $fileName | Resolve-Path 
-          $linkTargetPath = Join-Path -Path $linkDestDir -ChildPath $fileName
+        # Collegamento simbolico degli oggetti trovati
+        foreach ($itemName in $itemsToBeLinked) {
+          $itemAbsolutePath = Join-Path -Path $configAbsolutePath -ChildPath $itemName | Resolve-Path 
+          $linkTargetPath = Join-Path -Path $linkDestinationDir -ChildPath $itemName
 
-          Write-Verbose "[${fileName}] => Percorso sorgente: `"$programAbsPath`""
-          Write-Verbose "[${fileName}] => Percorso destinazione: `"$linkTargetPath`""
+          Write-Host -ForegroundColor Blue "[${itemName}]: '$itemAbsolutePath' => '$linkTargetPath'"
 
-          if ($PSCmdlet.ShouldProcess($fileName, "Collegamento simbolico")) {
-            New-Item -Path $linkTargetPath -Value $programAbsPath -ItemType SymbolicLink -Force
+          if ($PSCmdlet.ShouldProcess($itemName, "Collegamento simbolico")) {
+            New-Item -Path $linkTargetPath -Value $itemAbsolutePath -ItemType SymbolicLink -Force
           }
         }
       }
     } else {
-      Write-Error "Impossibile trovare le impostazioni di '$program'"
+      Write-Error "Impossibile trovare le impostazioni di '$configName'"
     }
   }
 }

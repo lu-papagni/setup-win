@@ -5,8 +5,8 @@
     {
       "Packages" : 
       [
-        { "PackageIdentifier" : "Discord.Discord" },
-        { "PackageIdentifier" : "Spotify.Spotify" }
+        { "PackageIdentifier" : "Valve.Steam" },
+        { "PackageIdentifier" : "HeroicGamesLauncher.HeroicGamesLauncher" },
       ],
       "SourceDetails" : 
       {

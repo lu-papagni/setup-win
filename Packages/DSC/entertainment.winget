@@ -1,0 +1,25 @@
+# Entertainment and communication packages
+properties:
+  configurationVersion: 0.2.0
+  resources:
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      directives:
+        description: Install Discord for communication and gaming
+        allowPrerelease: true
+      settings:
+        id: Discord.Discord
+        source: winget
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      directives:
+        description: Install Spotify for music streaming
+        allowPrerelease: true
+      settings:
+        id: Spotify.Spotify
+        source: winget
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      directives:
+        description: Install WhatsApp Desktop from Microsoft Store
+        allowPrerelease: true
+      settings:
+        id: 9NKSQGP7F2NH
+        source: msstore

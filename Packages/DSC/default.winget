@@ -1,0 +1,39 @@
+# Default essential packages configuration
+properties:
+  configurationVersion: 0.2.0
+  resources:
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      directives:
+        description: Install Eclipse Temurin 21 JDK for Java development
+        allowPrerelease: true
+      settings:
+        id: EclipseAdoptium.Temurin.21.JDK
+        source: winget
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      directives:
+        description: Install VLC media player for video playback
+        allowPrerelease: true
+      settings:
+        id: VideoLAN.VLC
+        source: winget
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      directives:
+        description: Install WinFsp for filesystem virtualization
+        allowPrerelease: true
+      settings:
+        id: WinFsp.WinFsp
+        source: winget
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      directives:
+        description: Install Brave browser for privacy-focused browsing
+        allowPrerelease: true
+      settings:
+        id: Brave.Brave
+        source: winget
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      directives:
+        description: Install Okular document viewer by KDE
+        allowPrerelease: true
+      settings:
+        id: KDE.Okular
+        source: winget

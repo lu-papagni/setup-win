@@ -5,9 +5,11 @@
     {
       "Packages" : 
       [
-        { "PackageIdentifier" : "Git.Git" },
-        { "PackageIdentifier" : "Debian.Debian" },
-        { "PackageIdentifier" : "Microsoft.WindowsTerminal" },
+        { "PackageIdentifier" : "EclipseAdoptium.Temurin.21.JDK" },
+        { "PackageIdentifier" : "VideoLAN.VLC" },
+        { "PackageIdentifier" : "WinFsp.WinFsp" },
+        { "PackageIdentifier" : "Brave.Brave" },
+        { "PackageIdentifier" : "KDE.Okular" },
       ],
       "SourceDetails" : 
       {

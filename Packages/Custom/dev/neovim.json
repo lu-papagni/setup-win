@@ -5,8 +5,12 @@
     {
       "Packages" : 
       [
-        { "PackageIdentifier" : "Valve.Steam" },
-        { "PackageIdentifier" : "EpicGames.EpicGamesLauncher" },
+        { "PackageIdentifier" : "Neovim.Neovim" },
+        { "PackageIdentifier" : "Neovide.Neovide" },
+        { "PackageIdentifier" : "junegunn.fzf" },
+        { "PackageIdentifier" : "BurntSushi.ripgrep.MSVC" },
+        { "PackageIdentifier" : "sharkdp.bat" },
+        { "PackageIdentifier" : "BrechtSanders.WinLibs.POSIX.UCRT" },
       ],
       "SourceDetails" : 
       {

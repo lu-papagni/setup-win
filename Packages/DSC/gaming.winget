@@ -1,0 +1,18 @@
+# Gaming related packages
+properties:
+  configurationVersion: 0.2.0
+  resources:
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      directives:
+        description: Install Steam gaming platform
+        allowPrerelease: true
+      settings:
+        id: Valve.Steam
+        source: winget
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      directives:
+        description: Install Heroic Games Launcher for Epic Games
+        allowPrerelease: true
+      settings:
+        id: HeroicGamesLauncher.HeroicGamesLauncher
+        source: winget
