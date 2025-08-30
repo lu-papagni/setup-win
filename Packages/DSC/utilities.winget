@@ -18,13 +18,6 @@ properties:
         source: winget
     - resource: Microsoft.WinGet.DSC/WinGetPackage
       directives:
-        description: Install Rclone for cloud storage management
-        allowPrerelease: true
-      settings:
-        id: Rclone.Rclone
-        source: winget
-    - resource: Microsoft.WinGet.DSC/WinGetPackage
-      directives:
         description: Install NAPS2 for document scanning
         allowPrerelease: true
       settings:
