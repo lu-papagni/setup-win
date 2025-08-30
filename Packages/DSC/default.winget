@@ -4,10 +4,10 @@ properties:
   resources:
     - resource: Microsoft.WinGet.DSC/WinGetPackage
       directives:
-        description: Install Eclipse Temurin 21 JDK for Java development
+        description: Install Java Runtime Environment for Java Apps
         allowPrerelease: true
       settings:
-        id: EclipseAdoptium.Temurin.21.JDK
+        id: EclipseAdoptium.Temurin.21.JRE
         source: winget
     - resource: Microsoft.WinGet.DSC/WinGetPackage
       directives:
