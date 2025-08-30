@@ -18,13 +18,6 @@ properties:
         source: winget
     - resource: Microsoft.WinGet.DSC/WinGetPackage
       directives:
-        description: Install WinFsp for filesystem virtualization
-        allowPrerelease: true
-      settings:
-        id: WinFsp.WinFsp
-        source: winget
-    - resource: Microsoft.WinGet.DSC/WinGetPackage
-      directives:
         description: Install Brave browser for privacy-focused browsing
         allowPrerelease: true
       settings:
