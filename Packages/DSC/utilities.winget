@@ -51,3 +51,10 @@ properties:
       settings:
         id: Rufus.Rufus
         source: winget
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      directives:
+        description: Install Okular document viewer by KDE
+        allowPrerelease: true
+      settings:
+        id: KDE.Okular
+        source: winget

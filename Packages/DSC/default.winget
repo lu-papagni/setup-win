@@ -23,10 +23,3 @@ properties:
       settings:
         id: Brave.Brave
         source: winget
-    - resource: Microsoft.WinGet.DSC/WinGetPackage
-      directives:
-        description: Install Okular document viewer by KDE
-        allowPrerelease: true
-      settings:
-        id: KDE.Okular
-        source: winget
