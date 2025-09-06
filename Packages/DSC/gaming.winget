@@ -11,7 +11,7 @@ properties:
         source: winget
     - resource: Microsoft.WinGet.DSC/WinGetPackage
       directives:
-        description: Install Heroic Games Launcher for Epic Games
+        description: Support for Epic Games and GOG games
         allowPrerelease: true
       settings:
         id: HeroicGamesLauncher.HeroicGamesLauncher
