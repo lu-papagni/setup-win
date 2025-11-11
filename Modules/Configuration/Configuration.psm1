@@ -10,7 +10,7 @@ function Get-SoftwareConfigNames {
 }
 
 function Ensure-DestinationDirectory {
-  param([string]$linkDestinationDir, $PSCmdlet)
+  param([string]$linkDestinationDir)
     if (-not (Test-Path -PathType Container -Path $linkDestinationDir)) {
       if ($PSCmdlet.ShouldProcess($linkDestinationDir, "Create directory")) {
         New-Item -ItemType Directory -Path $linkDestinationDir
@@ -37,7 +37,7 @@ function Create-SymbolicLink {
 }
 
 function Process-Target {
-  param($target, [string]$configAbsolutePath, $PSCmdlet)
+  param($target, [string]$configAbsolutePath)
     $targetRegex = $target.name
     $linkBasePath = Get-Item -Path ("Env:" + $target.root) | Select-Object -ExpandProperty Value
     $linkDestinationDir = Join-Path $linkBasePath $target.destination
@@ -52,7 +52,7 @@ function Process-Target {
 }
 
 function Process-SoftwareConfig {
-  param([string]$configName, $Programs, [string]$Path, $PSCmdlet)
+  param([string]$configName, $Programs, [string]$Path)
     $configAbsolutePath = Join-Path -Path $Path -ChildPath $configName | Resolve-Path
     if (Test-Path -Path $configAbsolutePath -PathType Container) {
       $targetList = $Programs.$configName

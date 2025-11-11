@@ -12,6 +12,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Check PowerShell script formatting
         shell: powershell
@@ -26,6 +28,29 @@ jobs:
               Write-Error "Formatting failed at $($_.FullName). Please run formatter locally."
               exit 1
             }
+          }
+
+      - name: Commit formatted scripts
+        # Only run this step on 'push' events to prevent issues with PRs from forks
+        if: github.event_name == 'push'
+        shell: powershell
+        run: |
+          # Check for changes
+          $gitStatus = git status -s
+
+          if ($gitStatus) {
+            Write-Host "Formatting changes detected. Committing and pushing..."
+      
+            # Configure Git user for the commit
+            git config --global user.name 'github-actions[bot]'
+            git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+      
+            # Stage, commit, and push the changes
+            git add .
+            git commit -m "ci: Auto-format PowerShell scripts (PSScriptAnalyzer)"
+            git push
+          } else {
+            Write-Host "No formatting changes to commit."
           }
 
       - name: Install Pester
