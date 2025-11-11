@@ -1,77 +1,101 @@
-function Import-Settings {
-  [CmdletBinding(SupportsShouldProcess = $true)]
-  param(
-    $Programs,
+function Test-ConfigDirectory {
+  param([string]$Path)
+  return Test-Path -Path $Path -PathType Container
+}
 
-    [Parameter(Mandatory=$true)]
-    [ValidateNotNullOrEmpty()]
-    [string] $Path
-  )
 
-  Write-Verbose ("Lista programmi:", (ConvertTo-Json $Programs) -join ' ')
-  Write-Verbose "Percorso configurazione: $Path"
+function Get-SoftwareConfigNames {
+  param($Programs)
+    return $Programs.PSObject.Properties.Name
+}
 
-  # Validazione directory configurazione
-  if (-not (Test-Path -Path $Path -PathType Container)) {
-    Write-Error "'$Path' non è una directory valida!"
-    return
-  }
-
-  Write-Verbose ("Chiavi di `$Programs: ", (ConvertTo-Json $Programs.PSObject.Properties.Name) -join ' ')
-
-  # Nomi delle cartelle corrispondenti ai nomi dei software di cui si vuole importare la configurazione
-  $softwareConfigDirNames = $Programs.PSObject.Properties.Name
-
-  if ($softwareConfigDirNames.Length -eq 0) {
-    Write-Host -ForegroundColor Magenta 'Nessuna configurazione da importare.'
-  }
-
-  foreach ($configName in $softwareConfigDirNames) {
-    $configAbsolutePath = Join-Path -Path $Path -ChildPath $configName | Resolve-Path
-
-    if (Test-Path -Path $configAbsolutePath -PathType Container) {
-      $targetList = $Programs.$configName
-
-      # Per ogni bersaglio indicato per un certo software
-      # trovo gli elementi che corrispondono all'espressione regolare fornita e la destinazione ad essi associata
-      foreach ($target in $targetList) {
-        $targetRegex = $target.name
-        $linkBasePath = Get-Item -Path ("Env:\" + $target.root) | Select-Object -ExpandProperty Value
-        $linkDestinationDir = Join-Path $linkBasePath $target.destination
-
-        # Creo la cartella di destinazione se non esiste
-        if (-not (Test-Path -PathType Container -Path $linkDestinationDir)) {
-          if ($PSCmdlet.ShouldProcess($linkDestinationDir, "Creazione directory")) {
-            New-Item -ItemType Directory -Path $linkDestinationDir
-          }
-        } else {
-          Write-Verbose "Il percorso '$linkDestinationDir' esiste, non lo sovrascrivo."
-        }
-
-        # Ottengo i nomi degli oggetti
-        $itemsToBeLinked = Resolve-Path "$configAbsolutePath" `
-          | Get-ChildItem `
-          | Where-Object { $_.Name -match "$targetRegex" } `
-          | Select-Object -ExpandProperty Name
-
-        Write-Verbose "Oggetti da linkare: $itemsToBeLinked"
-
-        # Collegamento simbolico degli oggetti trovati
-        foreach ($itemName in $itemsToBeLinked) {
-          $itemAbsolutePath = Join-Path -Path $configAbsolutePath -ChildPath $itemName | Resolve-Path 
-          $linkTargetPath = Join-Path -Path $linkDestinationDir -ChildPath $itemName
-
-          Write-Host -ForegroundColor Blue "[${itemName}]: '$itemAbsolutePath' => '$linkTargetPath'"
-
-          if ($PSCmdlet.ShouldProcess($itemName, "Collegamento simbolico")) {
-            New-Item -Path $linkTargetPath -Value $itemAbsolutePath -ItemType SymbolicLink -Force
-          }
-        }
+function Ensure-DestinationDirectory {
+  param([string]$linkDestinationDir, $PSCmdlet)
+    if (-not (Test-Path -PathType Container -Path $linkDestinationDir)) {
+      if ($PSCmdlet.ShouldProcess($linkDestinationDir, "Create directory")) {
+        New-Item -ItemType Directory -Path $linkDestinationDir
       }
     } else {
-      Write-Error "Impossibile trovare le impostazioni di '$configName'"
+      Write-Verbose "The path '$linkDestinationDir' exists, not overwriting."
     }
+}
+
+function Get-ItemsToLink {
+  param([string]$configAbsolutePath, [string]$targetRegex)
+    return Resolve-Path "$configAbsolutePath" |
+    Get-ChildItem |
+    Where-Object { $_.Name -match "$targetRegex" } |
+    Select-Object -ExpandProperty Name
+}
+
+function Create-SymbolicLink {
+  param([string]$itemName, [string]$itemAbsolutePath, [string]$linkTargetPath, $PSCmdlet)
+    Write-Host -ForegroundColor Blue "[${itemName}]: '$itemAbsolutePath' => '$linkTargetPath'"
+    if ($PSCmdlet.ShouldProcess($itemName, "Symbolic link")) {
+      New-Item -Path $linkTargetPath -Value $itemAbsolutePath -ItemType SymbolicLink -Force
+    }
+}
+
+function Process-Target {
+  param($target, [string]$configAbsolutePath, $PSCmdlet)
+    $targetRegex = $target.name
+    $linkBasePath = Get-Item -Path ("Env:" + $target.root) | Select-Object -ExpandProperty Value
+    $linkDestinationDir = Join-Path $linkBasePath $target.destination
+    Ensure-DestinationDirectory $linkDestinationDir $PSCmdlet
+    $itemsToBeLinked = Get-ItemsToLink $configAbsolutePath $targetRegex
+    Write-Verbose "Objects to link: $itemsToBeLinked"
+    foreach ($itemName in $itemsToBeLinked) {
+      $itemAbsolutePath = Join-Path -Path $configAbsolutePath -ChildPath $itemName | Resolve-Path
+        $linkTargetPath = Join-Path -Path $linkDestinationDir -ChildPath $itemName
+        Create-SymbolicLink $itemName $itemAbsolutePath $linkTargetPath $PSCmdlet
+    }
+}
+
+function Process-SoftwareConfig {
+  param([string]$configName, $Programs, [string]$Path, $PSCmdlet)
+    $configAbsolutePath = Join-Path -Path $Path -ChildPath $configName | Resolve-Path
+    if (Test-Path -Path $configAbsolutePath -PathType Container) {
+      $targetList = $Programs.$configName
+        foreach ($target in $targetList) {
+          Process-Target $target $configAbsolutePath $PSCmdlet
+        }
+    } else {
+      Write-Error "Unable to find settings for '$configName'"
+    }
+}
+
+
+function Import-Settings {
+  [CmdletBinding(SupportsShouldProcess = $true)]
+    param(
+        $Programs,
+        [Parameter(Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [string] $Path
+        )
+
+      if ($PSCmdlet.MyInvocation.BoundParameters['Verbose']) {
+        $Programs | Format-Table -AutoSize
+      }
+  Write-Verbose "Configuration path: $Path"
+
+    if (-not (Test-ConfigDirectory $Path)) {
+      Write-Error "'$Path' is not a valid directory!"
+      return
+    }
+
+  Write-Verbose ("Keys of `$Programs: ", (ConvertTo-Json $Programs.PSObject.Properties.Name) -join ' ')
+    $softwareConfigDirNames = Get-SoftwareConfigNames $Programs
+
+    if ($softwareConfigDirNames.Length -eq 0) {
+      Write-Host -ForegroundColor Magenta 'No configuration to import.'
+        return
+    }
+
+  foreach ($configName in $softwareConfigDirNames) {
+    Process-SoftwareConfig $configName $Programs $Path $PSCmdlet
   }
 }
+
 
 Export-ModuleMember -Function Import-Settings
