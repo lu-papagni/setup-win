@@ -1,4 +1,4 @@
-name: Pester Tests
+name: Format and Test
 
 on:
   push:
@@ -15,17 +15,14 @@ jobs:
 
       - name: Format PowerShell scripts
         run: |
-          pwsh -Command "Install-Module -Name PSScriptAnalyzer -Force -Scope CurrentUser"
-          pwsh -Command "Get-ChildItem -Path . -Filter *.ps1 -Recurse | ForEach-Object { Invoke-Formatter -Path $_.FullName -Verbose }"
-
-
-      - name: Setup PowerShell
-        uses: actions/setup-powershell@v2
+          powershell -Command "Install-Module -Name PSScriptAnalyzer -Force -Scope CurrentUser"
+          powershell -Command "Get-ChildItem -Path . -Filter *.ps1 -Recurse | ForEach-Object { Invoke-Formatter -Path $_.FullName -Verbose }"
 
       - name: Install Pester
         run: |
-          pwsh -Command "Install-Module -Name Pester -Force -Scope CurrentUser"
+          powershell -Command "Install-Module -Name Pester -Force -Scope CurrentUser"
 
       - name: Run Pester tests
         run: |
-          pwsh -Command "Invoke-Pester -Path . -Output Detailed"
+          powershell -Command "Invoke-Pester -Path . -Output Detailed"
+
