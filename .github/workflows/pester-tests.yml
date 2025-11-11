@@ -1,0 +1,31 @@
+name: Pester Tests
+
+on:
+  push:
+    branches: [ test ]
+  pull_request:
+    branches: [ test ]
+
+jobs:
+  test:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Format PowerShell scripts
+        run: |
+          pwsh -Command "Install-Module -Name PSScriptAnalyzer -Force -Scope CurrentUser"
+          pwsh -Command "Get-ChildItem -Path . -Filter *.ps1 -Recurse | ForEach-Object { Invoke-Formatter -Path $_.FullName -Verbose }"
+
+
+      - name: Setup PowerShell
+        uses: actions/setup-powershell@v2
+
+      - name: Install Pester
+        run: |
+          pwsh -Command "Install-Module -Name Pester -Force -Scope CurrentUser"
+
+      - name: Run Pester tests
+        run: |
+          pwsh -Command "Invoke-Pester -Path . -Output Detailed"
