@@ -17,18 +17,15 @@ jobs:
         shell: powershell
         run: |
           Install-Module -Name PSScriptAnalyzer -Force -Scope CurrentUser
-          $fail = $false
           Get-ChildItem -Path . -Filter *.ps1 -Recurse | ForEach-Object {
-          $content = Get-Content $_.FullName -Raw
-          $formatted = Invoke-Formatter -ScriptDefinition $content
-          if ($content -ne $formatted) {
-            Write-Host 'Formatting issues found in:' $_.FullName
-            $fail = $true
+            $content = Get-Content $_.FullName -Raw
+            try {
+              $formatted = Invoke-Formatter -ScriptDefinition $content
+              Set-Content -Path $_.FullName -Value $formatted
+            } catch {
+              Write-Error "Formatting failed at $($_.FullName). Please run formatter locally."
+              exit 1
             }
-          }
-          if ($fail) {
-            Write-Error 'Formatting failed. Please run formatter locally.'
-            exit 1
           }
 
       - name: Install Pester
