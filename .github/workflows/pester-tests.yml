@@ -13,10 +13,24 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Format PowerShell scripts
-        run: |
-          powershell -Command "Install-Module -Name PSScriptAnalyzer -Force -Scope CurrentUser"
-          powershell -Command "Get-ChildItem -Path . -Filter *.ps1 -Recurse | ForEach-Object { Invoke-Formatter -Path $_.FullName -Verbose }"
+    - name: Check PowerShell script formatting
+      run: |
+        powershell -Command "Install-Module -Name PSScriptAnalyzer -Force -Scope CurrentUser"
+        powershell -Command "
+          $fail = $false
+          Get-ChildItem -Path . -Filter *.ps1 -Recurse | ForEach-Object {
+            $content = Get-Content $_.FullName -Raw
+            $formatted = Invoke-Formatter -ScriptDefinition $content
+            if ($content -ne $formatted) {
+              Write-Host 'Formatting issues found in:' $_.FullName
+              $fail = $true
+            }
+          }
+          if ($fail) {
+            Write-Error 'Formatting failed. Please run formatter locally.'
+            exit 1
+          }
+        "
 
       - name: Install Pester
         run: |
