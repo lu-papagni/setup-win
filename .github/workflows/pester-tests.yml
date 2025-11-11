@@ -6,37 +6,38 @@ on:
   pull_request:
     branches: [ test ]
 
-jobs:
-  test:
-    runs-on: windows-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+  jobs:
+    test:
+      runs-on: windows-latest
+      steps:
+        - name: Checkout code
+          uses: actions/checkout@v4
 
-    - name: Check PowerShell script formatting
-      run: |
-        powershell -Command "Install-Module -Name PSScriptAnalyzer -Force -Scope CurrentUser"
-        powershell -Command "
-          $fail = $false
-          Get-ChildItem -Path . -Filter *.ps1 -Recurse | ForEach-Object {
-            $content = Get-Content $_.FullName -Raw
-            $formatted = Invoke-Formatter -ScriptDefinition $content
-            if ($content -ne $formatted) {
-              Write-Host 'Formatting issues found in:' $_.FullName
-              $fail = $true
-            }
-          }
-          if ($fail) {
-            Write-Error 'Formatting failed. Please run formatter locally.'
-            exit 1
-          }
-        "
+        - name: Check PowerShell script formatting
+          run: |
+            powershell -Command "Install-Module -Name PSScriptAnalyzer -Force -Scope CurrentUser"
+            powershell -Command "
+              $fail = $false
+              Get-ChildItem -Path . -Filter *.ps1 -Recurse | ForEach-Object {
+                $content = Get-Content $_.FullName -Raw
+                $formatted = Invoke-Formatter -ScriptDefinition $content
+                if ($content -ne $formatted) {
+                  Write-Host 'Formatting issues found in:' $_.FullName
+                  $fail = $true
+                }
+              }
+              if ($fail) {
+                Write-Error 'Formatting failed. Please run formatter locally.'
+                exit 1
+              }
+            "
 
-      - name: Install Pester
-        run: |
-          powershell -Command "Install-Module -Name Pester -Force -Scope CurrentUser"
+        - name: Install Pester
+          run: |
+            powershell -Command "Install-Module -Name Pester -Force -Scope CurrentUser"
 
-      - name: Run Pester tests
-        run: |
-          powershell -Command "Invoke-Pester -Path . -Output Detailed"
+        - name: Run Pester tests
+          run: |
+            powershell -Command "Invoke-Pester -Path . -Output Detailed"
+
 
